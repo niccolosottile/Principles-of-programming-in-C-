@@ -7,3 +7,5 @@ int howManyDays() {
 // Start counting Fridays on the 5th of the month from 31 December 2000 to 1 Jan 1801
 // Use the rules for month length (Might store in dictionary), with exception of leap years to be checked for arithmetically
 // Leap year must be divisible by 4 or if century by 400, return total count found.
+
+// change
