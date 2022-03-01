@@ -20,8 +20,8 @@ int howManyDays() {
     bool flagDecrease = true;
 
     // Continue going backwards until the day before 1 Jan 1801 (31 Dec 1800) is reached
-    while (currentDate.date[0] != 31 && currentDate.date[1] != 12 && currentDate.date[2] != 1800) {
-
+    while (currentDate.date[0] != 31 || currentDate.date[1] != 12 || currentDate.date[2] != 1800) {
+     
         // Check if it's a Friday on the 5th of the month
         if (currentDate.date[0] == 5 && currentDate.day == 5) {
             // Check if the year is not 2001 or higher (counting period starts from 31 Dec 2000)
@@ -63,6 +63,8 @@ int howManyDays() {
         // Decreasing day at every other iteration (day hasn't been decreased yet)
         if (flagDecrease) {
             currentDate.date[0]--;
+        }
+        else {
             // Reset flag to true
             flagDecrease = true;
         }
@@ -74,8 +76,6 @@ int howManyDays() {
         else {
             currentDate.day = 7;
         }
-
-        printf("%d|%d|%d\n", currentDate.date[0], currentDate.date[1], currentDate.date[2]);
 
     }
 
@@ -91,9 +91,3 @@ int main () {
  
    return 0;
 }
-
-// Start from the given date (24 March 2002 is a Wednesday) and go back in time
-// Start counting Fridays on the 5th of the month from 31 Dec 2000 to 1 Jan 1801
-// Use the rules for month length (Might store in dictionary), with exception of leap years to be checked for arithmetically
-// Leap year must be divisible by 4 or if century by 400, return total count found.
-
