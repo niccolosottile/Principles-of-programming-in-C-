@@ -44,8 +44,13 @@ int howManyDays() {
         if (currentDate.date[0] == 1) {
 
             // Checking if it's a leap year if it's Feb
-            if (currentDate.date[1] == 2 && (currentDate.date[2] % 4 == 0 || currentDate.date[2] % 400 == 0)) {
-                currentDate.date[0] = 29; 
+            if (currentDate.date[1] == 2) {
+
+                // Check if it's divisible by 400
+                if (currentDate.date[2] % 400 == 0 || (currentDate.date[2] % 4 == 0 && currentDate.date[2] % 100 != 0)) {
+                    currentDate.date[0] = 29;
+                }
+
             }
             // Any other case follows the table for common years
             else {

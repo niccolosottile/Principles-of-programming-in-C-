@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+// Just set a to 1 and increase and b to n and decrease
+
 bool containsDigit(int* number_ptr, int x) {
 
     // Retrieve value of number from pointer
