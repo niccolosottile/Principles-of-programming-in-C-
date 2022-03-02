@@ -77,6 +77,11 @@ int howManyDays() {
             currentDate.day = 7;
         }
 
+        if (currentDate.date[2] == 2000 && currentDate.date[1] == 12 && currentDate.date[0] == 31) {
+            printf("%d|%d|%d\n", currentDate.date[0], currentDate.date[1], currentDate.date[2]);
+            printf("%d\n", currentDate.day);
+        }
+
     }
 
     printf("COUNT: %d\n", count);
