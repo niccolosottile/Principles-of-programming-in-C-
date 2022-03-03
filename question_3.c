@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 void redact_words(const char *text_filename, const char *redact_words_filename){
 
@@ -13,20 +14,19 @@ void redact_words(const char *text_filename, const char *redact_words_filename){
 
     // Process redact to obtain an array containing the words to be redacted
     char redact[1024];
-    fread(redact, 1, 1024, redact_text);
+    fgets(redact, 1024, redact_text);
 
-    char delimiter[] = ", "; // Use spaces and commas as delimiters
     char redact_words[1024][25]; // Stores all words to be redacted
 
     // Separate each word to be redacted
-    char *ptr = strtok(redact, delimiter);
+    char *ptr = strtok(redact, ", ");
 
     int i = 0;
 
     while (ptr != NULL) {
 
         strcpy(redact_words[i], ptr); // Add word to array of words
-        ptr = strtok(NULL, delimiter); // Get next word using strtok with delimiter
+        ptr = strtok(NULL, ", "); // Get next word using strtok with delimiter
         i++;
 
     }
@@ -37,15 +37,66 @@ void redact_words(const char *text_filename, const char *redact_words_filename){
     // Read text file line by line and process each line
     while (fgets(text_str, 1024, text)) {
             
-            printf("%s", text_str);
+            // Separate each word from text
+            char *word_ptr = strtok(text_str, " ");
+            char *temp_word_ptr;
 
-            // Store line in string 
+            i = 0;
 
-            // Split string by words
+            while (word_ptr != NULL) {
 
+                // Compare word with redacted words
+
+                int j = 0;
+                bool found = false;
+
+                while (redact_words[j][0] != '\0') {
+
+                    // strcasecmp returns 0 if they are the same, 1 otherwise. It isn't case sensitive.
+                    if (strcasecmp(word_ptr, redact_words[j]) == 0) {
+                        found = true;
+                        break;
+                    }
+
+                    j++;
+                }
+
+                // Write word into result file
+                if (found) {
+
+                    // Substitute word with stars *
+                    for (int q = 0; q < strlen(word_ptr); q++) {
+                        word_ptr[q] = '*';
+                    }
+                    
+                }
+                
+                // Get next word and save it in temp location
+                temp_word_ptr = strtok(NULL, " ");
+
+                // Check if next word will be NULL or not (space or not)
+                if (temp_word_ptr != NULL) {
+                    fprintf(redacted_text, "%s ", word_ptr);
+                }
+                else {
+                    fprintf(redacted_text, "%s", word_ptr);
+                }
+
+                // Assign temp word to current word
+                word_ptr = temp_word_ptr;
+                i++;
+
+            }
+            
+            // Leaving a new line after writing to the result file
+            fprintf(redacted_text, "\n"); 
 
         }
     
+    // Freeing dynamic memory for text string
+    free(text_str);
+    text_str = NULL;
+
     // Closing all the files after use for r/w
     fclose(text);
     fclose(redact_text);
@@ -75,9 +126,3 @@ int main () {
 
     return 0;
 }
-
-// Redact a file given a set of redactable words (separated by commas) 
-// Replace a redacted letter with a star and output it to a file called "result.txt"
-// Read from input file and extract a set of words (using spaces)
-// Read from redacted words file and extract redacted words (using commas)
-// If any word matches with a redacted word, substitute with stars, copy into "result.txt"
