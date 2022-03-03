@@ -1,9 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-
-// Just set a to 1 and increase and b to n and decrease
 
 bool containsDigit(int* number_ptr, int x) {
 
@@ -29,17 +26,15 @@ bool containsDigit(int* number_ptr, int x) {
 
 void removeDigit(int x, int n, int* a_ptr, int* b_ptr){
 
-    // Seed the randomizer (only called once)
-    srand(time(NULL));
+    // Initialise a as 1 and b as n-1 (increase a and decrease b to get compatible sum) 
+    *a_ptr = 1;
+    *b_ptr = n - 1;
+
 
     while (true) {
 
-        // Assign a and b a random value between 1 and n - 1
-        *a_ptr = rand() % (n - 1) + 1;
-        *b_ptr = rand() % (n - 1) + 1;
-
         // Check if the digit x is contained in either a or b
-        if (containsDigit(a_ptr, x) == 0 && containsDigit(b_ptr, x) == 0) {
+        if (!containsDigit(a_ptr, x) && !containsDigit(b_ptr, x)) {
 
             // If a + b is equal to n we have a set of solutions
             if (*a_ptr + *b_ptr == n) {
@@ -47,6 +42,10 @@ void removeDigit(int x, int n, int* a_ptr, int* b_ptr){
             }
 
         }
+
+        // Increase a by 1 and decrease b by 1
+        (*a_ptr)++;
+        (*b_ptr)--;
 
     }
 
