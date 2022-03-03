@@ -1,6 +1,22 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+// Checks if it's a leap year
+bool checkLeapYear(int year) {
+
+    if (year % 4 == 0) {
+        if (year % 100 == 0) {
+            if(year % 400 == 0) {
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+    return false;
+
+}
+
 // Returns how many Fridays fell on the fifth of the month during the nineteenth and twentieth centuries (1 Jan 1801 to 31 Dec 2000) given the dates in the question text
 int howManyDays() {
 
@@ -43,15 +59,11 @@ int howManyDays() {
         // Decreasing month in case of 1 ___ ____
         if (currentDate.date[0] == 1) {
 
-            // Checking if it's a leap year if it's Feb
-            if (currentDate.date[1] == 2) {
-
-                // Check if it's divisible by 400
-                if (currentDate.date[2] % 400 == 0 || (currentDate.date[2] % 4 == 0 && currentDate.date[2] % 100 != 0)) {
-                    currentDate.date[0] = 29;
-                }
-
+            // Checking if it's a leap year if it's turning Feb
+            if (currentDate.date[1] == 3 && checkLeapYear(currentDate.date[2])) {
+                currentDate.date[0] = 29;
             }
+
             // Any other case follows the table for common years
             else {
                 // To get the correct number of days for the corresponding month index is decreased by 2 (because month hasn't been decreased yet)
@@ -81,12 +93,7 @@ int howManyDays() {
         else {
             currentDate.day = 7;
         }
-
-        if (currentDate.date[2] == 2000 && currentDate.date[1] == 12 && currentDate.date[0] == 31) {
-            printf("%d|%d|%d\n", currentDate.date[0], currentDate.date[1], currentDate.date[2]);
-            printf("%d\n", currentDate.day);
-        }
-
+        
     }
 
     printf("COUNT: %d\n", count);
