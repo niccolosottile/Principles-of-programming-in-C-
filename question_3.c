@@ -1,28 +1,54 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-
+#include <string.h>
 
 void redact_words(const char *text_filename, const char *redact_words_filename){
 
-    FILE *text, *redact, *redacted_text; // Declaring file names to be used for r/w
-    char buf_text[1024]; // Stores bytes to be read from text file
-    char buf_redact[1024]; // Stores bytes to be read from redact file
-    
-    int nread;
+    FILE *text, *redact_text, *redacted_text; // Declaring file names to be used for r/w
 
-    // Opening text and redacted text files for r
+    // Opening text, redact and redacted text files for r/w
     text = fopen(text_filename, "r");
-    redacted_text = fopen(redact_words_filename, "r");
+    redact_text = fopen(redact_words_filename, "r");
+    redacted_text = fopen("result.txt", "w");
 
-    // Keep redacting text until no more is left (nread is 0)
-    do {
-        nread = fread(buf_text, 1, 1024, text);
-        nread = fread(buf_redact, 1, 1024, redact);
-        
-    } while (nread > 0);
+    // Process redact to obtain an array containing the words to be redacted
+    char redact[1024];
+    fread(redact, 1, 1024, redact_text);
 
+    char delimiter[] = ", "; // Use spaces and commas as delimiters
+    char redact_words[1024][25]; // Stores all words to be redacted
+
+    // Separate each word to be redacted
+    char *ptr = strtok(redact, delimiter);
+
+    int i = 0;
+
+    while (ptr != NULL) {
+
+        strcpy(redact_words[i], ptr); // Add word to array of words
+        ptr = strtok(NULL, delimiter); // Get next word using strtok with delimiter
+        i++;
+
+    }
+
+    // Use malloc to allocate memory for text_str
+    char *text_str = (char *) malloc(1024);
+
+    // Read text file line by line and process each line
+    while (fgets(text_str, 1024, text)) {
+            
+            printf("%s", text_str);
+
+            // Store line in string 
+
+            // Split string by words
+
+
+        }
+    
+    // Closing all the files after use for r/w
     fclose(text);
+    fclose(redact_text);
     fclose(redacted_text);
 
 }
