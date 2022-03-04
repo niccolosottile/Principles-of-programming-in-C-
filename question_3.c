@@ -26,7 +26,7 @@ void redact_words(const char *text_filename, const char *redact_words_filename){
     while (ptr != NULL) {
 
         strcpy(redact_words[i], ptr); // Add word to array of words
-        ptr = strtok(NULL, ", "); // Get next word using strtok with delimiter
+        ptr = strtok(NULL, ", \n"); // Get next word using strtok with delimiter
         i++;
 
     }
@@ -79,7 +79,7 @@ void redact_words(const char *text_filename, const char *redact_words_filename){
                     fprintf(redacted_text, "%s ", word_ptr);
                 }
                 else {
-                    fprintf(redacted_text, "%s", word_ptr);
+                    fprintf(redacted_text, "%s\n", word_ptr);
                 }
 
                 // Assign temp word to current word
@@ -87,9 +87,6 @@ void redact_words(const char *text_filename, const char *redact_words_filename){
                 i++;
 
             }
-            
-            // Leaving a new line after writing to the result file
-            fprintf(redacted_text, "\n"); 
 
         }
     
