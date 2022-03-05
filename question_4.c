@@ -71,6 +71,8 @@ void swap_columns (char **table, int height, int first_column, int second_column
         table[i][second_column] = temp_column[i];
     }
 
+    free(temp_column);
+
 }
 
 /* 
@@ -179,6 +181,10 @@ void encrypt_columnar (const char *message_filename, const char *key_filename, c
 
     (*result)[q + 1] = '\0'; // Adding null pointer to string
 
+    free(message_ptr);
+    free(key_ptr);
+    free(table);
+
 }
 
 /* 
@@ -202,6 +208,10 @@ int decrypt_columnar (const char *message_filename, const char *key_filename, ch
         // - number of letters in message not divisible by key length
 
     if (message_length % key_length != 0) {
+
+        free(message_ptr);
+        free(key_ptr);
+
         return 0;
     }
 
@@ -306,6 +316,11 @@ int decrypt_columnar (const char *message_filename, const char *key_filename, ch
     }
 
     (*result)[q + 1] = '\0'; // Adding null pointer to string
+
+    free(message_ptr);
+    free(key_ptr);
+    free(table);
+    free(ordered_key_ptr);
 
     return 1;
 
