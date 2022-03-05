@@ -287,34 +287,19 @@ int decrypt_columnar (const char *message_filename, const char *key_filename, ch
 
     }
 
-    // Counting amount of memory needed for result string
-    int count = 0;
-
-    for (int i = 0; message_ptr[i] != '\0'; i++) {
-
-        if (message_ptr[i] != 'X') {
-            count++;
-        }
-
-    }
-
     // Initializing and allocating memory to result string
-    *result = (char *) malloc((count + 1) * sizeof(char));
+    *result = (char *) malloc((message_length + 1) * sizeof(char));
 
     // Read decrypted message from table into result string
     q = 0;
 
     for (int i = 1; i < y; i++) {
 
-        for(int j = 0; table[i][j] != '\0'; j++) {
+        for(int j = 0; table[i][j] != '\0'; j++) {     
 
-            if (table[i][j] != 'X') {      
-
-                // Add letter to result string
-                (*result)[q] = table[i][j];
-                q++;
-
-            }
+            // Add letter to result string
+            (*result)[q] = table[i][j];
+            q++;
 
         }
 
