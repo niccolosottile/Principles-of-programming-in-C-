@@ -48,12 +48,28 @@ char *read_string (const char *filename) {
 
 /*
  * A function used to swap two columns in the cipher table by column number
- * a buffer is passed as a parameter, along with the indexes of the columns
- * to be swapped, the function doesn't return anything as the buffer is modified
+ * a buffer is passed as a parameter, along with its height and the indexes 
+ * of the columns to be swapped, the function doesn't return anything as the 
+ * buffer is modified.
  */
-void swap_columns (char **result, int first_column, int second_column) {
+void swap_columns (char **table, int height, int first_column, int second_column) {
 
-    
+    // Storing copy of first column
+    char *temp_column = (char *) malloc(height * sizeof(char));
+
+    for (int i = 0; i < height; i++) {
+        temp_column[i] = table[i][first_column];
+    }
+
+    // Copying second column into first column
+    for (int i = 0; i < height; i++) {
+        table[i][first_column] = table[i][second_column];
+    }
+
+    // Copying first column with temp into second column
+    for (int i = 0; i < height; i++) {
+        table[i][second_column] = temp_column[i];
+    }
 
 }
 
@@ -81,13 +97,13 @@ void encrypt_columnar (const char *message_filename, const char *key_filename, c
         y += (message_length / key_length) + 1;
     }
 
-    result = (char **) malloc(y * sizeof(char *)); // Allocating height y of cipher
+    char **table = (char **) malloc(y * sizeof(char *)); // Allocating height y of cipher
      for(int i = 0; i < y; i++) {
-         result[i] = (char*) malloc((key_length + 1) * sizeof(char)); // Allocating width key_length + 1 (for '\0' character)
+         table[i] = (char*) malloc((key_length + 1) * sizeof(char)); // Allocating width key_length + 1 (for '\0' character)
     }
 
     // Writing key and message into result buffer
-    strcpy(result[0], key_ptr);
+    strcpy(table[0], key_ptr);
 
     int q = 0;
 
@@ -99,18 +115,18 @@ void encrypt_columnar (const char *message_filename, const char *key_filename, c
 
             // Adding null terminator to buffer
             if (j == key_length) {
-                result[i][j] = '\0';
+                table[i][j] = '\0';
                 continue;
             }
 
             // If end of message hasn't been reached copy it, else fill with X
             if (message_ptr[q] != '\0') {
                 
-                result[i][j] = message_ptr[q];
+                table[i][j] = message_ptr[q];
                 q++;
             }
             else {
-                result[i][j] = 'X';
+                table[i][j] = 'X';
             }
 
         }
@@ -118,32 +134,50 @@ void encrypt_columnar (const char *message_filename, const char *key_filename, c
     }
 
     // Sorting columns such that letters in keyword are alphabetically ordered
-    j = 0;
+    int j = 0;
     
     // Move sorted side of key (starting at 0) until key is all sorted
-    while (result[0][j] != '\0') {
+    while (table[0][j] != '\0') {
 
         // Find preceding column in unsorted side of key
-        int preceding_column = 0;
+        int preceding_column = j;
 
-        for (q = 0; result[0][q] != '\0'; q++) {
+        for (q = j + 1; table[0][q] != '\0'; q++) {
 
-            if (result[0][preceding_column] > result[0][q]) {
+            if (table[0][preceding_column] > table[0][q]) {
                 preceding_column = q;
             }
 
         }
 
         // Swap preceding column with first character in unsorted side of key
-        swap_columns(result, j, preceding_column);
+        swap_columns(table, y, j, preceding_column);
 
         j++;
 
     }
 
-    for (int i = 0; i < y; i++) {
-        printf("%s\n", result[i]);
+    // Initializing and allocating memory to result string
+    *result = (char *) malloc((((y - 1) * key_length) + 1) * sizeof(char));
+
+    
+
+    // Read the ciphertext from table into result string
+    q = 0;
+
+    for (int i = 1; i < y; i++) {
+
+        for(j = 0; table[i][j] != '\0'; j++) {      
+
+            // Add letter to result string
+            (*result)[q] = table[i][j];
+            q++;
+
+        }
+
     }
+
+    (*result)[q + 1] = '\0'; // Adding null pointer to string
 
 }
 
@@ -155,16 +189,152 @@ void encrypt_columnar (const char *message_filename, const char *key_filename, c
  *  should return true if decryption was successful, false if not.
  */
 int decrypt_columnar (const char *message_filename, const char *key_filename, char **result) {
-    return 1;   
+
+    char * key_ptr = read_string(key_filename); // Saving pointer to string
+    int key_length = strlen(key_ptr); // Length of string
+
+    char * message_ptr = read_string(message_filename);
+    int message_length = strlen(message_ptr);
+
+    // Condition where fail occurs (assuming X in encrypted message):
+
+        // - given a key with set number of letters
+        // - number of letters in message not divisible by key length
+
+    if (message_length % key_length != 0) {
+        return 0;
+    }
+
+    // Calculating height of cipher
+    int y = 1 + message_length / key_length;
+
+    char **table = (char **) malloc(y * sizeof(char *)); // Allocating height y of cipher
+     for(int i = 0; i < y; i++) {
+         table[i] = (char*) malloc((key_length + 1) * sizeof(char)); // Allocating width key_length + 1 (for '\0' character)
+    }
+
+    // Order the key in alphabetical order
+    char *ordered_key_ptr = (char *) malloc((key_length + 1) * sizeof(char)); 
+    strcpy(ordered_key_ptr, key_ptr);
+
+    int i = 0;
+    
+    // Move sorted side of key (starting at 0) until key is all sorted
+    while (ordered_key_ptr[i] != '\0') {
+
+        // Find preceding letter in unsorted side of key
+        int preceding_letter = i;
+
+        for (int q = i + 1; ordered_key_ptr[q] != '\0'; q++) {
+
+            if (ordered_key_ptr[preceding_letter] > ordered_key_ptr[q]) {
+                preceding_letter = q;
+            }
+
+        }
+
+        // Swap preceding letter with first character in unsorted side of key
+        char temp_letter = ordered_key_ptr[i];
+        ordered_key_ptr[i] = ordered_key_ptr[preceding_letter];
+        ordered_key_ptr[preceding_letter] = temp_letter;
+
+        i++;
+
+    }
+
+    // Insert key and encrypted message into table
+    strcpy(table[0], ordered_key_ptr);
+    
+    int q = 0;
+
+    // Iterate over each row in height y
+    for (int i = 1; i < y; i++) {
+        
+        // Iterate over each column
+        for (int j = 0; j < (key_length + 1); j++) {
+
+            // Adding null terminator to buffer
+            if (j == key_length) {
+                table[i][j] = '\0';
+                continue;
+            }
+
+            table[i][j] = message_ptr[q];
+            q++;
+
+        }
+
+    }
+
+    // Reorder table columns to form key
+
+        // - Look at each letter in key to see which column it is in
+
+        // - Swap each column to be in its correct position
+
+    // Iterate over each column at keyword level
+    for (int j = 0; table[0][j] != '\0'; j++) {
+
+        // Iterate over each letter in original keyword
+        for (q = 0; key_ptr[q] != '\0'; q++) {
+
+            if (table[0][j] == key_ptr[q]) {
+                swap_columns(table, y, j, q);
+                break;
+            }
+
+        }
+
+    }
+
+    // Counting amount of memory needed for result string
+    int count = 0;
+
+    for (int i = 0; message_ptr[i] != '\0'; i++) {
+
+        if (message_ptr[i] != 'X') {
+            count++;
+        }
+
+    }
+
+    // Initializing and allocating memory to result string
+    *result = (char *) malloc((count + 1) * sizeof(char));
+
+    // Read decrypted message from table into result string
+    q = 0;
+
+    for (int i = 1; i < y; i++) {
+
+        for(int j = 0; table[i][j] != '\0'; j++) {
+
+            if (table[i][j] != 'X') {      
+
+                // Add letter to result string
+                (*result)[q] = table[i][j];
+                q++;
+
+            }
+
+        }
+
+    }
+
+    (*result)[q + 1] = '\0'; // Adding null pointer to string
+
+    return 1;
+
 }
 
 int main () {
 
     const char *message_file = "message.txt";
     const char *key_file = "keyword.txt";
-    char **result;
+    char *result;
 
-    encrypt_columnar(message_file, key_file, result);
+    decrypt_columnar(message_file, key_file, &result);
+
+    printf("%s\n", result);
 
     return 0;
 }
