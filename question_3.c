@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,27 +34,48 @@ void redact_words(const char *text_filename, const char *redact_words_filename){
 
     // Use malloc to allocate memory for text_str
     char *text_str = (char *) malloc(1024);
+    char *compare_word_ptr;
 
     // Read text file line by line and process each line
     while (fgets(text_str, 1024, text)) {
             
             // Separate each word from text
-            char *word_ptr = strtok(text_str, " ");
+            char *word_ptr = strtok(text_str, " \n");
+            compare_word_ptr = (char *) malloc((strlen(word_ptr) + 1) * sizeof(char));
             char *temp_word_ptr;
 
             i = 0;
 
             while (word_ptr != NULL) {
 
-                // Compare word with redacted words
+                strcpy(compare_word_ptr, word_ptr);
 
+                // Remove any non-alphabetic character for comparison
+                for (int j = 0; compare_word_ptr[j] != '\0'; j++) {
+
+                    if(!isalpha((unsigned char) compare_word_ptr[j])) {
+                        
+                        // Shift all letters to remove current one
+                        int q = j;
+    
+                        while (compare_word_ptr[q] != '\0') {
+
+                            compare_word_ptr[q] = compare_word_ptr[q + 1];
+                            q++;
+                        }
+
+                    }
+
+                }
+
+                // Compare word with redacted words
                 int j = 0;
                 bool found = false;
 
                 while (redact_words[j][0] != '\0') {
 
                     // strcasecmp returns 0 if they are the same, 1 otherwise. It isn't case sensitive.
-                    if (strcasecmp(word_ptr, redact_words[j]) == 0) {
+                    if (strcasecmp(compare_word_ptr, redact_words[j]) == 0) {
                         found = true;
                         break;
                     }
@@ -66,13 +88,17 @@ void redact_words(const char *text_filename, const char *redact_words_filename){
 
                     // Substitute word with stars *
                     for (int q = 0; q < strlen(word_ptr); q++) {
-                        word_ptr[q] = '*';
+                        
+                        if (isalpha(word_ptr[q])) {
+                            word_ptr[q] = '*';
+                        }
+
                     }
                     
                 }
                 
                 // Get next word and save it in temp location
-                temp_word_ptr = strtok(NULL, " ");
+                temp_word_ptr = strtok(NULL, " \n");
 
                 // Check if next word will be NULL or not (space or not)
                 if (temp_word_ptr != NULL) {
@@ -92,6 +118,7 @@ void redact_words(const char *text_filename, const char *redact_words_filename){
     
     // Freeing dynamic memory for text string
     free(text_str);
+    free(compare_word_ptr);
     text_str = NULL;
 
     // Closing all the files after use for r/w
