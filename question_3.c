@@ -17,6 +17,11 @@ void redact_words(const char *text_filename, const char *redact_words_filename){
     char redact[1024];
     fgets(redact, 1024, redact_text);
 
+    // If string is empty, return nothing
+    if (strlen(redact) == 0) {
+        return;
+    }
+
     char redact_words[1024][25]; // Stores all words to be redacted
 
     // Separate each word to be redacted

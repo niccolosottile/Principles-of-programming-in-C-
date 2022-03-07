@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Struct used to store nodex of XOR linked list
 typedef struct node {
@@ -15,10 +16,14 @@ Node* calculate_xor_value(Node* before, Node* after) {
 // Inserts the string at the beginning of the XOR linked list.
 void insert_string(Node** head, const char* newObj) {
 
-    // String should not be added if it's more than 64 bytes
-    if (sizeof(newObj) > 64) {
-        printf("The string is too long :)\n");
+    // String should not be added if it's more than 64 bytes (1 byte per char)
+    if (strlen(newObj) + 1 > 64) {
+        return;
     }
+
+    printf("continued");
+
+    
 
 }
 
@@ -55,9 +60,7 @@ void free_all(Node** head) {
 int main () {
 
     Node* head = NULL;
-    insert_string(&head, "TVpvKWwEtupRsC7QsD9Ik1TgSFDVW6lUBi8zZG5f0zd8HHC5XfTlyFziOV2WWHs
-");
-    //insert_string(&head, "Alpha");
+    insert_string(&head, "Alpha");
     //insert_string(&head, "Bravo");
     //insert_string(&head, "Charlie");
 

@@ -1,7 +1,1 @@
-while (*word_ptr) {
-
-                //     if(!isalpha((unsigned char) *word_ptr)) {
-                //         printf("%c\n", *word_ptr);
-                //     }
-
-                // }
+FaHyw2XYv4Y8434vBcJ9R7vyVxjPb40doP4TN8WoxXlzj7k6omTbtlkfdJsvFmB
