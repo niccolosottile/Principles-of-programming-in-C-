@@ -24,7 +24,6 @@ void insert_string(Node** head, const char* newObj) {
     // Allocating memory for new node (both at struct level and object level)
     Node *new_node = (Node *) malloc(sizeof(Node));
     new_node->name = (char *) malloc(strlen(newObj) + 1);
-    new_node->xor_value = (Node *) malloc(sizeof(Node));
 
     // Assigning string to new node
     strcpy(new_node->name, newObj);
@@ -70,7 +69,6 @@ int insert_before(Node** head, const char* before, const char* newObj) {
             // Create new node for newObj
             Node *new_node = (Node *) malloc(sizeof(Node));
             new_node->name = (char *) malloc(strlen(newObj) + 1);
-            new_node->xor_value = (Node *) malloc(sizeof(Node));
 
             // Assigning name to new node
             strcpy(new_node->name, newObj);
@@ -118,7 +116,6 @@ int insert_after(Node** head, const char* after, const char* newObj) {
             // Create new node for newObj
             Node *new_node = (Node *) malloc(sizeof(Node));
             new_node->name = (char *) malloc(strlen(newObj) + 1);
-            new_node->xor_value = (Node *) malloc(sizeof(Node));
 
             // Assigning name to new node
             strcpy(new_node->name, newObj);
@@ -270,7 +267,56 @@ int remove_before(Node** head, const char *before, char *result) {
 
 // Removes all nodes and releases any memory allocated to the linked list
 void free_all(Node** head) {
-    
+
+    Node *curr = *head;
+    Node *prev = NULL;
+    Node *next;
+
+    Node *temp;
+
+    int flag_free = 0;
+
+    while (curr != NULL) {
+
+        temp = prev;
+
+        // Get next node in the XOR Linked List
+        next = calculate_xor_value(prev, curr->xor_value);
+
+        // Update node value
+        prev = curr;
+        curr = next;
+
+        if (temp != NULL) {
+
+            printf("%s\n", temp->name);
+
+            free(temp->name);
+            free(temp);
+        }
+
+        if (curr == NULL) {
+            flag_free = 1;
+        }
+
+    }
+
+    // Free last node in XOR Linked List (if you have to)
+    if (flag_free) {
+        temp = prev;
+
+        printf("%s\n", temp->name);
+
+        free(temp->name);
+        free(temp);
+    }
+
+        // Temp | Curr  | Prev | Next 
+        //      | Alpha | NULL | 
+        // NULL | Bravo | Alpha| Bravo
+        // Alpha| Charlie| Bravo| Charlie -> free Alpha 
+        // Bravo| NULL | Charlie | NULL -> free Bravo
+        // Curr is NULL
 }
 
 int main () {
@@ -290,20 +336,22 @@ int main () {
 
     printf("_______________\n");
 
-    char *result = malloc(64);
+    //char *result = malloc(64);
 
-    remove_before(&head, "Charlie", result);
+    //remove_before(&head, "Charlie", result);
 
-    printf("REMOVED: %s\n", result);
+    //printf("REMOVED: %s\n", result);
 
-    free(result);
+    //free(result);
+
+    free_all(&head);
 
     // Going back to Yessir from Alpha
     //Node *previous = head;
-    printf("%s\n", head->name);
-    head = calculate_xor_value(NULL, head->xor_value);
+    //printf("%s\n", head->name);
+    //head = calculate_xor_value(NULL, head->xor_value);
     //Node *previous2 = head;
-    printf("%s\n", head->name);
+    //printf("%s\n", head->name);
     //head = calculate_xor_value(previous, head->xor_value);
     //printf("%s\n", head->name);
     //head = calculate_xor_value(previous2, head->xor_value);
