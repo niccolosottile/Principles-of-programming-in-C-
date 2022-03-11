@@ -53,6 +53,30 @@ int insert_before(Node** head, const char* before, const char* newObj) {
         return 0;
     }
 
+    // If before string is the head, then insert before head
+    if (!strcmp((*head)->name, before)) {
+
+        // Create new node for newObj
+        Node *new_node = (Node *) malloc(sizeof(Node));
+        new_node->name = (char *) malloc(strlen(newObj) + 1);
+
+        // Assigning name to new node
+        strcpy(new_node->name, newObj);
+
+        // Assign XOR value by doing previous and next
+        new_node->xor_value = calculate_xor_value(NULL, *head);
+
+        Node *next_head = calculate_xor_value(NULL, (*head)->xor_value);
+
+        // Change head XOR value by doing next (to it) and new node
+        (*head)->xor_value = calculate_xor_value(new_node, next_head);
+
+        // Assign new node as head
+        *head = new_node;
+
+        return 1;
+    }
+
     // Go through XOR linked list
     Node *curr = *head;
     Node *prev = NULL;
@@ -112,6 +136,16 @@ int insert_after(Node** head, const char* after, const char* newObj) {
 
         // If the string "after" is found, insert newObj after that
         if (!strcmp(curr->name, after)) {
+
+            // If next is NULL, then there is nothing to its right
+            if (next == NULL) {
+
+                // The insert string function can be used
+                insert_string(&curr, newObj);
+
+                return 1;
+
+            }
 
             // Create new node for newObj
             Node *new_node = (Node *) malloc(sizeof(Node));
@@ -188,6 +222,11 @@ int remove_after(Node** head, const char *after, char *result) {
         // If the string "after" is found, delete node after that
         if (!strcmp(curr->name, after)) {
 
+            // Check that there is a node after the string "after"
+            if (next == NULL) {
+                return 0;
+            }
+
             // Store node to be removed temporarily
             Node *temp = next;
             
@@ -224,6 +263,11 @@ int remove_before(Node** head, const char *before, char *result) {
         return 0;
     }
 
+    // If the string "before" is at head, return false
+    if (!strcmp((*head)->name, before)) {
+        return 0;
+    }
+
     // Go through XOR linked list
     Node *curr = *head;
     Node *prev = NULL;
@@ -239,12 +283,28 @@ int remove_before(Node** head, const char *before, char *result) {
 
             // Store node to be removed temporarily
             Node *temp = curr;
-            
-            // Get node next to prev
-            Node *next_removed = calculate_xor_value(prev->xor_value, temp);
 
-            // Change XOR value for prev
-            prev->xor_value = calculate_xor_value(next_removed, next);
+            // If there is no previous node, next will be the new head
+            if (prev == NULL) {
+                
+                // New head is the string "before"
+                *head = next;
+
+                // Get node next to the new head
+                Node *next_head = calculate_xor_value(temp, (*head)->xor_value);
+
+                (*head)->xor_value = calculate_xor_value(NULL, next_head);
+                
+            }
+            else {
+
+                // Get node next to prev
+                Node *next_removed = calculate_xor_value(prev->xor_value, temp);
+
+                // Change XOR value for prev
+                prev->xor_value = calculate_xor_value(next_removed, next);
+
+            }
 
             // Returning value of removed node to the result string
             strcpy(result, temp->name);
@@ -344,7 +404,7 @@ int main () {
 
     //free(result);
 
-    free_all(&head);
+    //free_all(&head);
 
     // Going back to Yessir from Alpha
     //Node *previous = head;

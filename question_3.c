@@ -25,7 +25,7 @@ void redact_words(const char *text_filename, const char *redact_words_filename){
     char redact_words[1024][25]; // Stores all words to be redacted
 
     // Separate each word to be redacted
-    char *ptr = strtok(redact, ", ");
+    char *ptr = strtok(redact, ", \n");
 
     int i = 0;
 
@@ -43,6 +43,14 @@ void redact_words(const char *text_filename, const char *redact_words_filename){
 
     // Read text file line by line and process each line
     while (fgets(text_str, 1024, text)) {
+
+        // If line is empty don't process it, just write it in result file
+        if (strspn(text_str, " \t\n") == strlen(text_str)) {
+            fprintf(redacted_text, "\n");
+            continue;
+        }
+
+        else {
             
             // Separate each word from text
             char *word_ptr = strtok(text_str, " \n");
@@ -62,7 +70,7 @@ void redact_words(const char *text_filename, const char *redact_words_filename){
                         
                         // Shift all letters to remove current one
                         int q = j;
-    
+
                         while (compare_word_ptr[q] != '\0') {
 
                             compare_word_ptr[q] = compare_word_ptr[q + 1];
@@ -118,13 +126,13 @@ void redact_words(const char *text_filename, const char *redact_words_filename){
                 i++;
 
             }
-
         }
+
+    }
     
     // Freeing dynamic memory for text string
     free(text_str);
     free(compare_word_ptr);
-    text_str = NULL;
 
     // Closing all the files after use for r/w
     fclose(text);

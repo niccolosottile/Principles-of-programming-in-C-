@@ -100,7 +100,7 @@ void encrypt_columnar (const char *message_filename, const char *key_filename, c
     }
 
     char **table = (char **) malloc(y * sizeof(char *)); // Allocating height y of cipher
-     for(int i = 0; i < y; i++) {
+    for(int i = 0; i < y; i++) {
          table[i] = (char*) malloc((key_length + 1) * sizeof(char)); // Allocating width key_length + 1 (for '\0' character)
     }
 
@@ -179,10 +179,13 @@ void encrypt_columnar (const char *message_filename, const char *key_filename, c
 
     }
 
-    (*result)[q + 1] = '\0'; // Adding null pointer to string
+    (*result)[q] = '\0'; // Adding null pointer to string
 
     free(message_ptr);
     free(key_ptr);
+    for(int i = 0; i < y; i++) {
+        free(table[i]);
+    }
     free(table);
 
 }
@@ -315,12 +318,15 @@ int decrypt_columnar (const char *message_filename, const char *key_filename, ch
 
     }
 
-    (*result)[q + 1] = '\0'; // Adding null pointer to string
+    (*result)[q] = '\0'; // Adding null pointer to string
 
     free(message_ptr);
     free(key_ptr);
-    free(table);
     free(ordered_key_ptr);
+    for(int i = 0; i < y; i++) {
+        free(table[i]);
+    }
+    free(table);
 
     return 1;
 
