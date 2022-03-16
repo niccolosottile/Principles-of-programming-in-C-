@@ -21,24 +21,30 @@ char *read_string (const char *filename) {
     clean_text = strtok(clean_text, "\n"); // Getting rid of empty line
 
     // Iterating over each character
-    int i, j;
+    int i = 0;
 
-    for (i = 0; clean_text[i] != '\0'; i++) {
+    while (clean_text[i] != '\0') {
 
         // If character is not any of this cases, remove it
-        if (! ((clean_text[i] >= 'A' && clean_text[i] <= 'Z') || (clean_text[i] >= 'a' && clean_text[i] <= 'z') || (clean_text[i] >= 0 && clean_text[i] <= 9) || clean_text[i] == '\0')) {
+        if (!((clean_text[i] >= 'A' && clean_text[i] <= 'Z') || (clean_text[i] >= 'a' && clean_text[i] <= 'z') || (clean_text[i] >= 48 && clean_text[i] <= 57) || clean_text[i] == '\0')) {
 
             // Shift all characters to overwrite the one to be removed
-            for (j = i; clean_text[j] != '\0'; j++) {
+            int j = i;
+
+            while (clean_text[j] != '\0') {
                 clean_text[j] = clean_text[j + 1];
+                
+                j++;
             }
 
-            clean_text[j] = '\0'; // Mark new end of string
+            clean_text[j-1] = '\0'; // Mark new end of string
 
         }
 
         // Convert each valid character to uppercase
         clean_text[i] = toupper(clean_text[i]);
+
+        i++;
         
     }
 
@@ -161,8 +167,6 @@ void encrypt_columnar (const char *message_filename, const char *key_filename, c
 
     // Initializing and allocating memory to result string
     *result = (char *) malloc((((y - 1) * key_length) + 1) * sizeof(char));
-
-    
 
     // Read the ciphertext from table into result string
     q = 0;
@@ -338,7 +342,7 @@ int main () {
     const char *key_file = "keyword.txt";
     char *result;
 
-    decrypt_columnar(message_file, key_file, &result);
+    encrypt_columnar(message_file, key_file, &result);
 
     printf("%s\n", result);
 
