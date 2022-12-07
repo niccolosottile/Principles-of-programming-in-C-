@@ -1,3 +1,3 @@
-# pop-2-coursework
+# Principles of programming in C
 
-5 programming questions in C to answer for the Principles of Programming 2 Coursework!
+5 programming questions in C which test your understanding of C programming (syntax, data structures, pointers, and dynamic memory allocation)
