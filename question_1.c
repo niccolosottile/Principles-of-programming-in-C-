@@ -96,9 +96,7 @@ int howManyDays() {
         
     }
 
-    printf("COUNT: %d\n", count);
-
-    return 1;
+    return count;
 
 }
 
